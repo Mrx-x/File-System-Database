@@ -4,8 +4,10 @@
 #include <QObject>
 #include <QString>
 #include <QStandardItemModel>
+#include <QDateTime>
 
-#include <Scanner/IScanner.h>
+#include "Scanner/IScanner.h"
+#include "Model/ScanItem.h"
 
 class IDatabaseService;
 
@@ -15,6 +17,7 @@ class ScanController : public QObject
 
 public:
     using DatabasePtr = std::shared_ptr<IDatabaseService>;
+    using ScanItemPtr = std::unique_ptr<ScanItem>;
 
 public:
     ScanController(IScanner* scanner, const DatabasePtr& database, QObject* parent = nullptr);
@@ -23,8 +26,9 @@ public:
     QStandardItemModel* model() const;
 
 public slots:
-    void startScan(const QString& path);
-    void doLoad(int scanId);
+    void doScan(const QString& path);
+    void doSave();
+    void doLoad();
 
 private:
     void addNodeToModel(const ScanItem* item, QStandardItem* parent);
@@ -35,6 +39,9 @@ private:
     IScanner* _scanner;
     QStandardItemModel* _model;
     DatabasePtr _database;
+    ScanItemPtr _lastScanItem;
+    QString _lastPath;
+    QDateTime _lastTime;
 };
 
 #endif // SCANCONTROLLER_H

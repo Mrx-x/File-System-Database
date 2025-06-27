@@ -29,19 +29,11 @@ MainWindow::MainWindow(QWidget *parent)
         QString dir = QFileDialog::getExistingDirectory(this, "Select folder");
         if (!dir.isEmpty())
         {
-            _controller->startScan(dir);
+            _controller->doScan(dir);
         }
     });
-
-    connect(ui->btnLoad, &QPushButton::clicked, this, [this]() {
-        auto list = _database->getAvailableScans();
-        bool ok = false;
-        int id = QInputDialog::getInt(this, "Load Scan", "Scan ID:", list.isEmpty() ? 0 : list.first(), 0, list.isEmpty() ? 0 : list.last(), 1, &ok);
-        if (ok)
-        {
-            _controller->doLoad(id);
-        }
-    });
+    connect(ui->btnLoad, &QPushButton::clicked, _controller, &ScanController::doLoad);
+    connect(ui->btnSave, &QPushButton::clicked, _controller, &ScanController::doSave);
 }
 
 MainWindow::~MainWindow()

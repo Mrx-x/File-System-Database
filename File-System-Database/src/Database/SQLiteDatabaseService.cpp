@@ -24,11 +24,18 @@ void SQLiteDatabaseService::open(const QString &filePath)
     createTablesIfNeeded();
 }
 
-int SQLiteDatabaseService::saveScanTree(const ScanItem *root, const QString &path, const QDateTime &scanTime)
+int SQLiteDatabaseService::upsertScanTree(const ScanItem *root, const QString &path, const QDateTime &scanTime)
 {
     _database.transaction();
 
-    int scanId = insertScanMeta(path, scanTime);
+    int existingId = getScanIdByPath(path);
+    if (existingId >= 0)
+    {
+        deleteScanById(existingId);
+    }
+
+    int scanId = insertScanMeta(existingId, path, scanTime);
+
     insertItem(root, scanId, -1);
 
     _database.commit();
@@ -63,6 +70,19 @@ QList<int> SQLiteDatabaseService::getAvailableScans() const
     return list;
 }
 
+QList<QPair<int, QString> > SQLiteDatabaseService::getAllScanIdsAndPaths() const
+{
+    QList<QPair<int, QString>> list;
+    QSqlQuery query(_database);
+
+    query.exec("SELECT id, path FROM scans ORDER BY scan_time DESC");
+    while (query.next())
+    {
+        list.append({ query.value(0).toInt(), query.value(1).toString() });
+    }
+    return list;
+}
+
 QString SQLiteDatabaseService::getScanPath(int scanId) const
 {
     QSqlQuery query(_database);
@@ -90,7 +110,7 @@ void SQLiteDatabaseService::createTablesIfNeeded()
     query.exec(R"(
         CREATE TABLE IF NOT EXISTS scans (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        path TEXT NOT NULL,
+        path TEXT NOT NULL UNIQUE,
         scan_time TEXT NOT NULL
       );
     )");
@@ -103,18 +123,27 @@ void SQLiteDatabaseService::createTablesIfNeeded()
         name TEXT NOT NULL,
         size INTEGER NOT NULL,
         type INTEGER NOT NULL,
-        FOREIGN KEY(scan_id) REFERENCES scans(id),
-        FOREIGN KEY(parent_id) REFERENCES scan_items(id)
+        FOREIGN KEY(scan_id) REFERENCES scans(id) ON DELETE CASCADE,
+        FOREIGN KEY(parent_id) REFERENCES scan_items(id) ON DELETE CASCADE
       );
     )");
 }
 
-int SQLiteDatabaseService::insertScanMeta(const QString &path, const QDateTime &timeStamp)
+int SQLiteDatabaseService::insertScanMeta(int scanId, const QString &path, const QDateTime &timeStamp)
 {
     QSqlQuery query(_database);
-    query.prepare("INSERT INTO scans(path, scan_time) VALUES(:p, :t)");
 
-    query.bindValue(":p", path);
+    if (scanId < 0)
+    {
+        query.prepare("INSERT INTO scans(path, scan_time) VALUES(:p, :t)");
+        query.bindValue(":p", path);
+    }
+    else
+    {
+        query.prepare("UPDATE scans SET scan_time=:t WHERE id=:id");
+        query.bindValue(":id", scanId);
+    }
+
     query.bindValue(":t", timeStamp);
 
     query.exec();
@@ -180,4 +209,26 @@ std::unique_ptr<ScanItem> SQLiteDatabaseService::loadItem(int itemId, ScanItem *
     }
 
     return node;
+}
+
+int SQLiteDatabaseService::getScanIdByPath(const QString &path) const
+{
+    QSqlQuery query(_database);
+    query.prepare("SELECT id FROM scans WHERE path=:p");
+    query.bindValue(":p", path);
+    query.exec();
+
+    if (query.next())
+    {
+        return query.value(0).toInt();
+    }
+    return -1;
+}
+
+void SQLiteDatabaseService::deleteScanById(int scanId)
+{
+    QSqlQuery query(_database);
+    query.prepare("DELETE FROM scans WHERE id=:id");
+    query.bindValue(":id", scanId);
+    query.exec();
 }

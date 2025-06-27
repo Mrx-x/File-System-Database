@@ -1,11 +1,11 @@
 #include "Controller/ScanController.h"
-#include "Model/ScanItem.h"
 #include "Database/IDatabaseService.h"
 
 #include <QStandardItem>
 #include <QList>
 #include <QLocale>
 #include <QDateTime>
+#include <QInputDialog>
 
 ScanController::ScanController(IScanner *scanner, const DatabasePtr& database, QObject *parent)
     : QObject(parent)
@@ -16,19 +16,39 @@ ScanController::ScanController(IScanner *scanner, const DatabasePtr& database, Q
     _model->setHorizontalHeaderLabels({ "Name", "Size" });
 }
 
-void ScanController::startScan(const QString &path)
+void ScanController::doScan(const QString &path)
 {
-    auto root = _scanner->scan(path);
-    _database->saveScanTree(root.get(), path, QDateTime::currentDateTime());
-    _model->clear();
-    _model->setHorizontalHeaderLabels({ "Name", "Size" });
-    buildModel(root.get());
+    _lastScanItem = _scanner->scan(path);
+    _lastPath = path;
+    _lastTime = QDateTime::currentDateTime();
+    buildModel(_lastScanItem.get());
 }
 
-void ScanController::doLoad(int scanId)
+void ScanController::doSave()
 {
-    auto loaded = _database->loadScanTree(scanId);
-    buildModel(loaded.get());
+    if (!_lastScanItem) return;
+    _database->upsertScanTree(_lastScanItem.get(), _lastPath, _lastTime);
+}
+
+void ScanController::doLoad()
+{
+    auto list = _database->getAllScanIdsAndPaths();
+    if (list.isEmpty()) return;
+
+    QStringList paths;
+    for (auto& p : list)
+    {
+        paths << QString("%1: %2").arg(p.first).arg(p.second);
+    }
+
+    bool ok = false;
+    QString sel = QInputDialog::getItem(nullptr, "Load Scan", "Select scan:", paths, 0, false, &ok);
+
+    if (!ok) return;
+
+    int id = sel.section(":", 0, 0).toInt();
+    _lastScanItem = _database->loadScanTree(id);
+    buildModel(_lastScanItem.get());
 }
 
 QStandardItemModel *ScanController::model() const

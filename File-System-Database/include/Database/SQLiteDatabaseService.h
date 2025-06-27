@@ -12,17 +12,23 @@ public:
 
 public:
     void open(const QString& filePath) override;
-    int saveScanTree(const ScanItem* root, const QString& path, const QDateTime& scanTime) override;
+    int upsertScanTree(const ScanItem* root, const QString& path, const QDateTime& scanTime) override;
     std::unique_ptr<ScanItem> loadScanTree(int scanId) override;
+
     QList<int> getAvailableScans() const override;
+    QList<QPair<int, QString>> getAllScanIdsAndPaths() const override;
+
     QString getScanPath(int scanId) const override;
     QDateTime getScanTime(int scanId) const override;
 
 private:
     void createTablesIfNeeded();
-    int insertScanMeta(const QString& path, const QDateTime& timeStamp);
+    int insertScanMeta(int scanId, const QString& path, const QDateTime& timeStamp);
     void insertItem(const ScanItem* item, int scanId, int parentId);
     std::unique_ptr<ScanItem> loadItem(int itemId, ScanItem* parent = nullptr) const;
+
+    int  getScanIdByPath(const QString& path) const;
+    void deleteScanById(int scanId);
 
 private:
     QSqlDatabase _database;
