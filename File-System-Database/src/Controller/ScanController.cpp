@@ -6,6 +6,8 @@
 #include <QLocale>
 #include <QDateTime>
 #include <QInputDialog>
+#include <QApplication>
+#include <QStyle>
 
 ScanController::ScanController(IScanner *scanner, const DatabasePtr& database, QObject *parent)
     : QObject(parent)
@@ -82,14 +84,20 @@ void ScanController::addNodeToModel(const ScanItem *item, QStandardItem *parent)
 
     QString fileName = item->name();
 
+    auto* nameItem = new QStandardItem(fileName);
+    auto* sizeItem = new QStandardItem(convertFileSizeToHumanReadable(item->size()));
+
     if (item->type() == ScanItem::Type::Folder)
     {
         fileName += " (" + QString::number(item->childCount()) + ")";
+        nameItem->setIcon(QApplication::style()->standardIcon(QStyle::SP_DirIcon));
+    }
+    else
+    {
+        nameItem->setIcon(QApplication::style()->standardIcon(QStyle::SP_FileIcon));
     }
 
-    row << new QStandardItem(fileName)
-        << new QStandardItem(convertFileSizeToHumanReadable(item->size()));
-
+    row << nameItem << sizeItem;
     parent->appendRow(row);
 
     for (int i = 0; i < item->childCount(); ++i)
