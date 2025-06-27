@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 
 set(PROJECT_SOURCES
         File-System-Database/main.cpp
@@ -20,6 +20,7 @@ set(PROJECT_SOURCES
         File-System-Database/src/Scanner/DirectoryScanner.cpp
         File-System-Database/src/Model/ScannerItem.cpp
         File-System-Database/src/Controller/ScanController.cpp
+        File-System-Database/src/Database/SQLiteDatabaseService.cpp
 )
 
 SET(HEADERS
@@ -27,6 +28,8 @@ SET(HEADERS
     File-System-Database/include/Scanner/DirectoryScanner.h
     File-System-Database/include/Model/ScanItem.h
     File-System-Database/include/Controller/ScanController.h
+    File-System-Database/include/Database/IDatabaseService.h
+    File-System-Database/include/Database/SQLiteDatabaseService.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -38,12 +41,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 else()
     add_executable(File-System-Database
         ${PROJECT_SOURCES}
+        ${HEADERS}
     )
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/File-System-Database/include)
 
-target_link_libraries(File-System-Database PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(File-System-Database PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)
 
 include(GNUInstallDirs)
 install(TARGETS File-System-Database

@@ -6,24 +6,42 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1090</width>
-    <height>647</height>
+    <width>940</width>
+    <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>File Scan App</string>
+   <string>File System DB</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTreeView" name="treeView"/>
+     <layout class="QHBoxLayout" name="hl_buttons">
+      <item>
+       <widget class="QPushButton" name="btnScan">
+        <property name="text">
+         <string>Scan…</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnLoad">
+        <property name="text">
+         <string>Load…</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCompare">
+        <property name="text">
+         <string>Compare…</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="btnScan">
-      <property name="text">
-       <string>Scan Folder</string>
-      </property>
-     </widget>
+     <widget class="QTreeView" name="treeView"/>
     </item>
    </layout>
   </widget>

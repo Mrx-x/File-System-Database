@@ -1,13 +1,16 @@
 #include "Controller/ScanController.h"
 #include "Model/ScanItem.h"
+#include "Database/IDatabaseService.h"
 
 #include <QStandardItem>
 #include <QList>
 #include <QLocale>
+#include <QDateTime>
 
-ScanController::ScanController(IScanner *scanner, QObject *parent)
+ScanController::ScanController(IScanner *scanner, const DatabasePtr& database, QObject *parent)
     : QObject(parent)
     , _scanner(scanner)
+    , _database(database)
 {
     _model = new QStandardItemModel(this);
     _model->setHorizontalHeaderLabels({ "Name", "Size" });
@@ -16,9 +19,16 @@ ScanController::ScanController(IScanner *scanner, QObject *parent)
 void ScanController::startScan(const QString &path)
 {
     auto root = _scanner->scan(path);
+    _database->saveScanTree(root.get(), path, QDateTime::currentDateTime());
     _model->clear();
     _model->setHorizontalHeaderLabels({ "Name", "Size" });
     buildModel(root.get());
+}
+
+void ScanController::doLoad(int scanId)
+{
+    auto loaded = _database->loadScanTree(scanId);
+    buildModel(loaded.get());
 }
 
 QStandardItemModel *ScanController::model() const
