@@ -60,16 +60,33 @@ void MainWindow::populateChangeList(const std::vector<ChangeEntry> &changes)
     for (auto& e : changes)
     {
         QString prefix;
+        Qt::GlobalColor color = Qt::white;
+
         switch (e.type)
         {
-        case ScanItem::Change::New: prefix = "A: "; break;
-        case ScanItem::Change::Deleted: prefix = "D: "; break;
-        case ScanItem::Change::Modified: prefix = "M: "; break;
+        case ScanItem::Change::New:
+        {
+            prefix = "A: ";
+            color = Qt::darkGreen;
+            break;
+        }
+        case ScanItem::Change::Deleted:
+        {
+            prefix = "D: ";
+            color = Qt::darkRed;
+            break;
+        }
+        case ScanItem::Change::Modified:
+        {
+            prefix = "M: ";
+            color = Qt::darkYellow;
+            break;
+        }
         default: prefix = " "; break;
         }
 
         auto item = new QListWidgetItem(prefix + e.path, ui->changeList);
-
+        item->setForeground(color);
         ui->changeList->addItem(item);
     }
 }
