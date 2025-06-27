@@ -9,6 +9,8 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+class ScanController;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -19,5 +21,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    ScanController* _controller;
 };
 #endif // MAINWINDOW_H

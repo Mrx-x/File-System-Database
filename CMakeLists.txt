@@ -17,18 +17,31 @@ set(PROJECT_SOURCES
         File-System-Database/mainwindow.cpp
         File-System-Database/mainwindow.h
         File-System-Database/mainwindow.ui
+        File-System-Database/src/Scanner/DirectoryScanner.cpp
+        File-System-Database/src/Model/ScannerItem.cpp
+        File-System-Database/src/Controller/ScanController.cpp
+)
+
+SET(HEADERS
+    File-System-Database/include/Scanner/IScanner.h
+    File-System-Database/include/Scanner/DirectoryScanner.h
+    File-System-Database/include/Model/ScanItem.h
+    File-System-Database/include/Controller/ScanController.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(File-System-Database
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        ${HEADERS}
     )
 else()
     add_executable(File-System-Database
         ${PROJECT_SOURCES}
     )
 endif()
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/File-System-Database/include)
 
 target_link_libraries(File-System-Database PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
