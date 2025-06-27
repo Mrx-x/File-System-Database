@@ -8,6 +8,7 @@ class ScanItem
 {
 public:
     enum class Type { File, Folder };
+    enum class Change { Unchanged, New, Deleted, Modified };
 
     ScanItem(const QString& name, qint64 size, Type type, ScanItem* parent = nullptr);
     ~ScanItem();
@@ -24,6 +25,8 @@ public:
 public:
     QString name() const;
     Type type() const;
+    Change change() const;
+    void setChange(Change change);
 
 private:
     std::vector<std::unique_ptr<ScanItem>> _children;
@@ -31,6 +34,7 @@ private:
     QString _name;
     qint64 _size;
     Type _type;
+    Change _change;
 };
 
 #endif // SCANITEM_H

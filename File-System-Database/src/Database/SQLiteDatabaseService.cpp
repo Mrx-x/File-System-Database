@@ -57,6 +57,25 @@ std::unique_ptr<ScanItem> SQLiteDatabaseService::loadScanTree(int scanId)
     return loadItem(query.value(0).toInt(), nullptr);
 }
 
+std::unique_ptr<ScanItem> SQLiteDatabaseService::loadLastScanByPath(const QString &path)
+{
+    QSqlQuery query(_database);
+    query.prepare(R"(
+        SELECT id FROM scans
+        WHERE path = :p
+    )");
+
+    query.bindValue(":p", path);
+
+    if (query.exec() && query.next())
+    {
+        int scanId = query.value(0).toInt();
+        return loadScanTree(scanId);
+    }
+
+    return nullptr;
+}
+
 QList<int> SQLiteDatabaseService::getAvailableScans() const
 {
     QList<int> list;

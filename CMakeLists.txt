@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
         File-System-Database/src/Model/ScannerItem.cpp
         File-System-Database/src/Controller/ScanController.cpp
         File-System-Database/src/Database/SQLiteDatabaseService.cpp
+        File-System-Database/src/Comporator/TreeComporator.cpp
 )
 
 SET(HEADERS
@@ -30,6 +31,7 @@ SET(HEADERS
     File-System-Database/include/Controller/ScanController.h
     File-System-Database/include/Database/IDatabaseService.h
     File-System-Database/include/Database/SQLiteDatabaseService.h
+    File-System-Database/include/Comporator/TreeComporator.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

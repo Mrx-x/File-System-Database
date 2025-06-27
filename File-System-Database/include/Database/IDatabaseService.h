@@ -15,6 +15,7 @@ public:
     virtual void open(const QString& path) = 0;
     virtual int upsertScanTree(const ScanItem* root, const QString& path, const QDateTime& scanTime) = 0;
     virtual std::unique_ptr<ScanItem> loadScanTree(int scanId) = 0;
+    virtual std::unique_ptr<ScanItem> loadLastScanByPath(const QString& path) = 0;
 
     virtual QList<int> getAvailableScans() const = 0;
     virtual QList<QPair<int, QString>> getAllScanIdsAndPaths() const = 0;

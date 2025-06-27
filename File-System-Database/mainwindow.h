@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "Comporator/TreeComporator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,6 +23,12 @@ public:
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+public slots:
+    void onCompareFinished(const std::vector<ChangeEntry>& changes);
+
+private:
+    void populateChangeList(const std::vector<ChangeEntry>& changes);
 
 private:
     Ui::MainWindow *ui;

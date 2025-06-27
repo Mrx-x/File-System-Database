@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1044</width>
-    <height>635</height>
+    <width>1028</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>File System DB</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="vl_main">
     <item>
      <layout class="QHBoxLayout" name="hl_buttons">
       <item>
@@ -38,17 +38,20 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="btnCompare">
-        <property name="text">
-         <string>Compare…</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item>
-     <widget class="QTreeView" name="treeView"/>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Orientation::Vertical</enum>
+      </property>
+      <widget class="QTreeView" name="treeView"/>
+      <widget class="QListWidget" name="changeList">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>

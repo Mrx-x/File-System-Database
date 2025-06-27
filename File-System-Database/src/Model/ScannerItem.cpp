@@ -5,6 +5,7 @@ ScanItem::ScanItem(const QString& name, qint64 size, Type type, ScanItem* parent
     , _name(name)
     , _size(size)
     , _type(type)
+    , _change(Change::Unchanged)
 {
 
 }
@@ -38,6 +39,16 @@ ScanItem* ScanItem::parent() const
 QString ScanItem::name() const
 {
     return _name;
+}
+
+void ScanItem::setChange(Change change)
+{
+    _change = change;
+}
+
+ScanItem::Change ScanItem::change() const
+{
+    return _change;
 }
 
 qint64 ScanItem::size() const

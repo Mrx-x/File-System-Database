@@ -14,6 +14,7 @@ public:
     void open(const QString& filePath) override;
     int upsertScanTree(const ScanItem* root, const QString& path, const QDateTime& scanTime) override;
     std::unique_ptr<ScanItem> loadScanTree(int scanId) override;
+    std::unique_ptr<ScanItem> loadLastScanByPath(const QString& path) override;
 
     QList<int> getAvailableScans() const override;
     QList<QPair<int, QString>> getAllScanIdsAndPaths() const override;

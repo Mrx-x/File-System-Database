@@ -8,6 +8,7 @@
 
 #include "Scanner/IScanner.h"
 #include "Model/ScanItem.h"
+#include "Comporator/TreeComporator.h"
 
 class IDatabaseService;
 
@@ -29,11 +30,16 @@ public slots:
     void doScan(const QString& path);
     void doSave();
     void doLoad();
+    void doCompare(const QString& path);
+
+signals:
+    void compareFinished(const std::vector<ChangeEntry>& changes);
 
 private:
     void addNodeToModel(const ScanItem* item, QStandardItem* parent);
     void buildModel(const ScanItem* root);
     QString convertFileSizeToHumanReadable(const qint64 & bytes) const;
+    void clearModel() const;
 
 private:
     IScanner* _scanner;

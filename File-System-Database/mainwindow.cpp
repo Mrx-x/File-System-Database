@@ -34,9 +34,42 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->btnLoad, &QPushButton::clicked, _controller, &ScanController::doLoad);
     connect(ui->btnSave, &QPushButton::clicked, _controller, &ScanController::doSave);
+    connect(_controller, &ScanController::compareFinished, this, &MainWindow::onCompareFinished);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onCompareFinished(const std::vector<ChangeEntry> &changes)
+{
+    populateChangeList(changes);
+}
+
+void MainWindow::populateChangeList(const std::vector<ChangeEntry> &changes)
+{
+    ui->changeList->clear();
+
+    if (changes.empty())
+    {
+        ui->changeList->addItem("No changes detected");
+        return;
+    }
+
+    for (auto& e : changes)
+    {
+        QString prefix;
+        switch (e.type)
+        {
+        case ScanItem::Change::New: prefix = "A: "; break;
+        case ScanItem::Change::Deleted: prefix = "D: "; break;
+        case ScanItem::Change::Modified: prefix = "M: "; break;
+        default: prefix = " "; break;
+        }
+
+        auto item = new QListWidgetItem(prefix + e.path, ui->changeList);
+
+        ui->changeList->addItem(item);
+    }
 }

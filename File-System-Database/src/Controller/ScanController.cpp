@@ -13,7 +13,7 @@ ScanController::ScanController(IScanner *scanner, const DatabasePtr& database, Q
     , _database(database)
 {
     _model = new QStandardItemModel(this);
-    _model->setHorizontalHeaderLabels({ "Name", "Size" });
+    clearModel();
 }
 
 void ScanController::doScan(const QString &path)
@@ -22,6 +22,18 @@ void ScanController::doScan(const QString &path)
     _lastPath = path;
     _lastTime = QDateTime::currentDateTime();
     buildModel(_lastScanItem.get());
+
+    auto prevScan = _database->loadLastScanByPath(path);
+
+    if (prevScan)
+    {
+        auto changes = TreeComporator::compare(prevScan.get(), _lastScanItem.get());
+        emit compareFinished(changes);
+    }
+    else
+    {
+        emit compareFinished({});
+    }
 }
 
 void ScanController::doSave()
@@ -49,6 +61,14 @@ void ScanController::doLoad()
     int id = sel.section(":", 0, 0).toInt();
     _lastScanItem = _database->loadScanTree(id);
     buildModel(_lastScanItem.get());
+}
+
+void ScanController::doCompare(const QString &path)
+{
+    if (!_lastScanItem) return;
+    auto newTree = _scanner->scan(path);
+    auto changes = TreeComporator::compare(_lastScanItem.get(), newTree.get());
+
 }
 
 QStandardItemModel *ScanController::model() const
@@ -80,6 +100,7 @@ void ScanController::addNodeToModel(const ScanItem *item, QStandardItem *parent)
 
 void ScanController::buildModel(const ScanItem *root)
 {
+    clearModel();
     addNodeToModel(root, _model->invisibleRootItem());
 }
 
@@ -163,4 +184,10 @@ QString ScanController::convertFileSizeToHumanReadable(const qint64 & bytes) con
             }
         }
     }
+}
+
+void ScanController::clearModel() const
+{
+    _model->clear();
+    _model->setHorizontalHeaderLabels({ "Name", "Size" });
 }
